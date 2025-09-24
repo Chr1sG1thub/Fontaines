@@ -89,7 +89,7 @@ const fountainredIcon = new L.Icon({
 var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
 
 var fontainesGroup = L.layerGroup();
-//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
+
   fetch('fontaines.json')
   .then(response => response.json())
   .then(locations => {
@@ -98,7 +98,7 @@ var fontainesGroup = L.layerGroup();
     var isToggled = markerStates[index] || false;
 
   // Create marker with icon based on saved state
-  var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon }).addTo(map);
+  var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
 
   // Store toggle state on marker object for quick access
   marker.isToggled = isToggled;
