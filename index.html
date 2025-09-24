@@ -29,7 +29,7 @@
 // Store visibility states
    
     // Set up map at a chosen starting location 
-const map = L.map('map').setView([42.640356, 2.522745], 16);
+const map = L.map('map').setView([42.640356, 2.522745], 15);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 20,
@@ -50,7 +50,7 @@ navigator.geolocation.watchPosition(
     var latlng = [position.coords.latitude, position.coords.longitude];
     if (!userMarker) {
       userMarker = L.marker(latlng, { icon: locationIcon }).addTo(map);
-      map.setView(latlng, 16);
+      map.panTo(latlng);
     } else {
       userMarker.setLatLng(latlng);
     }
