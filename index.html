@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+  <meta charset="utf-8">
+  <title>Info Cyclisme</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    #map { height: 800px; width: 100%; }
+    .ascensionstt {background-color: palegreen}
+    .cafestt {background-color: wheat}
+
+  </style>
+<link rel="stylesheet" type="text/css" href="styles.css" />
+
+  
+
+</head>
+
+<body>
+  
+  <div id="map"></div>
+
+<button title="Aide" style="
+  position: absolute; 
+  right: 10px; 
+  top: 10px;
+  width: 50px;
+  font-size: 28px;
+  border-radius: 6px;
+  z-index: 1001" onclick="document.getElementById('help-popup1').style.display='block'"><STRONG>?</STRONG></button>
+
+  <button id="help-popup1" style="
+  position: absolute; 
+  left: 50%; 
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001; 
+  background: white; 
+  box-shadow: 0 2px 8px #33333355;
+  border-radius: 6px;
+  display: none;" onclick="function () {
+    };"
+    
+  <P>[1/2]</P>
+<P>La carte indique les ascensions <img src="mountain.png" height="20px">, les cafés <img src="coffee.png" height="20px"> et les points d'eau (fontaine <img src="fountain.png" height="20px">, robinet <img src="tap.png" height="20px">, toilettes <img src="toilets.png" height="20px">, autre <img src="water.png" height="20px">).</P>
+
+    <P>Vous pouvez afficher ou masquer les icônes de chaque catégorie en cliquant sur les boutons (en haut à droite).</P>
+
+<P>Le point bleu indique votre position actuelle (cela peut ne pas fonctionner correctement en intérieur).</P>
+
+<P>Cliquez sur l'icône d'une ascension pour voir son altitude et, pour certaines ascensions, son profil (nouvelle fenêtre).</P>
+
+    <BR><i>Cliquez pour regarder [2/2].</i>
+</button>
+<script>
+  document.getElementById('help-popup1').onclick = function () {
+    document.getElementById('help-popup1').style.display='none';
+    document.getElementById('help-popup2').style.display='block';
+  };
+</script>
+  
+  <button id="help-popup2" style="
+  position: absolute; 
+  left: 50%; 
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001; 
+  background: white; 
+  box-shadow: 0 2px 8px #33333355;
+  border-radius: 6px;
+  display: none;" onclick="document.getElementById('help-popup2').style.display='none'">
+<P>[2/2]</P>
+
+<P>Cliquez sur l'icône d'un café pour voir son nom et son emplacement. Vous pouvez ensuite cliquer pour accéder à des informations supplémentaires détenues par Google, notamment ses horaires d'ouverture (nouvelle fenêtre).</P>
+
+<P>Cliquez sur l'icône d'un point d'eau pour voir son type (cela devrait déjà être visible sur l'icône). <i>Avertissement : ces informations sont extraites d'OpenStreetMap et n'ont pas été vérifiées par mes soins. Des erreurs et omissions peuvent survenir : points d'eau non potables ou ne fonctionnant plus, toilettes inaccessibles, etc.</i> <strong>Vous utilisez ces informations à vos propres risques.</strong></P>
+
+<!--<P>Les noms des ascensions et des cafés s'affichent automatiquement au-delà d'un certain niveau de zoom.</P> -->
+
+<P>L'application est une page Web, vous pouvez donc l'ajouter à vos favoris ou l'ajouter à l'écran d'accueil de votre téléphone.</P>
+    <BR><i>Cliquez pour fermer.</i>
+
+</button>
+
+  <!--  <button style="position: absolute; top: 60px; right: 50px; font-size: 16px; width: 120px; z-index: 1001">Accueil</button> -->
+<button id="toggleAscensions" title="Ascensions" style="position: absolute; top: 50px; right: 10px; font-size: 16px; width: 50px; z-index: 1001; border-radius: 6px"><img src="mountain.png" style="height: 30px"></button>
+<button id="toggleCafes" title="Cafés" style="position: absolute; top: 90px; right: 10px; font-size: 16px; width: 50px; z-index: 1001; border-radius: 6px"><img src="coffee.png" style="height: 30px"></button>
+<button id="toggleEau" title="Points d'Eau" style="position: absolute; top: 130px; right: 10px; font-size: 16px; width: 50px; z-index: 1001; border-radius: 6px;"><img src="water.png" style="height: 30px"></button>
+
+  <script>
+
+    // Returns true if the device supports hovering (i.e., mouse/trackpad)
+//const canHover = window.matchMedia('(hover: hover)').matches;
+
+// Store visibility states
+  var ascensionsVisible = true;
+  var cafesVisible = true;
+  var eauVisible = true;
+
+  // Toggle button event handler
+  document.getElementById('toggleAscensions').onclick = function () {
+    if (ascensionsVisible) {
+      map.removeLayer(ascensionsGroup);
+      ascensionsVisible = false;
+      document.getElementById('toggleAscensions').style.opacity = 0.4;
+    } else {
+      map.addLayer(ascensionsGroup);
+      ascensionsVisible = true;
+      document.getElementById('toggleAscensions').style.opacity = 1;
+   }
+  };
+
+  document.getElementById('toggleCafes').onclick = function () {
+    if (cafesVisible) {
+      map.removeLayer(cafesGroup);
+      cafesVisible = false;
+      document.getElementById('toggleCafes').style.opacity = 0.4;
+    } else {
+      map.addLayer(cafesGroup);
+      cafesVisible = true;
+      document.getElementById('toggleCafes').style.opacity = 1;
+   }
+  };
+
+    document.getElementById('toggleEau').onclick = function () {
+    if (eauVisible) {
+      map.removeLayer(eauGroup);
+      eauVisible = false;
+      document.getElementById('toggleEau').style.opacity = 0.4;
+    } else {
+      map.addLayer(eauGroup);
+      eauVisible = true;
+      document.getElementById('toggleEau').style.opacity = 1;
+   }
+  };
+  
+    // Set up map at a chosen starting location 
+const map = L.map('map').setView([42.65644, 2.58587], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 20,
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+  const locationIcon = new L.Icon({
+  iconUrl: 'location.ico',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+ // popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});    
+let userMarker = null;
+navigator.geolocation.watchPosition(
+  function(position) {
+    var latlng = [position.coords.latitude, position.coords.longitude];
+    if (!userMarker) {
+      userMarker = L.marker(latlng, { icon: locationIcon }).addTo(map);
+      map.setView(latlng, 12);
+    } else {
+      userMarker.setLatLng(latlng);
+    }
+  },
+  function(error) {
+    //alert("Geolocation failed: " + error.message);
+  },
+  {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000}
+);
+
+// Optionally handle location error
+//map.on('locationerror', function(e) {
+//    alert(e.message);
+//});
+  
+  const mountainIcon = new L.Icon({
+  iconUrl: 'mountain.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});    
+
+   const coffeeIcon = new L.Icon({
+  iconUrl: 'coffee.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});    
+
+  const waterIcon = new L.Icon({
+  iconUrl: 'water.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});
+
+const tapIcon = new L.Icon({
+  iconUrl: 'tap.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});
+
+const fountainIcon = new L.Icon({
+  iconUrl: 'fountain.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});
+
+const toiletsIcon = new L.Icon({
+  iconUrl: 'toilets.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});
+
+    // Create an empty LayerGroup
+var ascensionsGroup = L.layerGroup();
+//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
+  fetch('ascensions.json')
+  .then(response => response.json())
+  .then(locations => {
+    locations.forEach(loc => {
+
+    var marker = L.marker([loc.Lat, loc.Lon], { icon: mountainIcon });
+  ascensionsGroup.addLayer(marker);  
+      var ppp = `<STRONG>${loc.Name}</STRONG><BR>Elevation: ${loc.Height}m<BR><BR><a HREF="${loc.Profile}" TARGET="_blank">Profil</a> <BR><I>(Nouvelle Fenêtre)</I>`;
+      if (loc.Profile.length == 0) ppp = `<STRONG>${loc.Name}</STRONG><BR>Elevation: ${loc.Height}m`;
+      // Add a popup with extra fields from the sheet
+      marker.bindPopup(ppp);
+      //marker.off('mouseover');
+      //marker.off('mouseout');
+//if(canHover){
+  var tt = `<STRONG>${loc.Name}</STRONG>`;
+      marker.bindTooltip(tt, {
+  className: "ascensionstt",
+  permanent: false, // default, show only on hover
+  interactive: false,
+  offset: L.point(10, 10),
+  opacity: 0.6,  sticky: true //???
+});
+    // Attach event listeners for each marker
+    marker.on('popupopen', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0);
+    });
+
+    marker.on('popupclose', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0.6);
+       var zoom = map.getZoom();
+            ascensionsGroup.eachLayer( function (layer){
+                //console.log(layer);
+                if ( zoom >= 13 ) {
+                    layer.openTooltip();
+                }
+            });
+    });
+//} // if(CanHover)
+
+  });
+    // Add the LayerGroup to the map
+ascensionsGroup.addTo(map);
+  })
+  .catch(err => {
+    console.error('Failed to load locations:', err);
+  });
+
+    // Create an empty LayerGroup
+var cafesGroup = L.layerGroup();
+//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
+  fetch('cafes.json')
+  .then(response => response.json())
+  .then(locations => {
+    locations.forEach(loc => {
+
+  if (loc.Actif == 'Y') {
+  const marker = L.marker([loc.Lat, loc.Lon], { icon: coffeeIcon }).addTo(map);
+  cafesGroup.addLayer(marker);  
+      // Add a popup with extra fields from the sheet
+      marker.bindPopup(`<STRONG>${loc.Name}</STRONG><BR>${loc.Location}<BR><BR><A HREF="${loc.LinkURL}" TARGET="_blank">Détails</A><BR><I>(Nouvelle Fenêtre)</I>`);
+     //marker.off('mouseover');
+      //marker.off('mouseout');
+//if(canHover){
+      var tt = `<STRONG>${loc.Name}</STRONG><BR>${loc.Location}`;
+      marker.bindTooltip(tt, {
+  className: "cafestt",
+  permanent: false, // default, show only on hover
+  interactive: false,
+  offset: L.point(10, 10),
+  opacity: 0.6,  sticky: true //???
+});
+    // Attach event listeners for each marker
+    marker.on('popupopen', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0);
+    });
+
+    marker.on('popupclose', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0.6);
+      
+       var zoom = map.getZoom();
+            cafesGroup.eachLayer( function (layer){
+                //console.log(layer);
+                if ( zoom >= 13 ) {
+                    layer.openTooltip();
+                }
+            });
+    });
+  //} // if(canHover)
+  } // if (loc.Actif == 'Y')
+
+  });
+    // Add the LayerGroup to the map
+cafesGroup.addTo(map);
+  })
+  .catch(err => {
+    console.error('Failed to load locations:', err);
+  });
+
+    // Create an empty LayerGroup
+var eauGroup = L.layerGroup();
+//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
+  fetch('eau.json')
+  .then(response => response.json())
+  .then(locations => {
+    locations.forEach(loc => {
+
+ if (loc.Display == 'Y') {
+
+    let iconToUse;
+    if (loc.Type === 'Fontaine') {
+      iconToUse = fountainIcon;
+    } else if (loc.Type === 'Robinet') {
+      iconToUse = tapIcon;
+    } else if (loc.Type === 'Toilettes') {
+      iconToUse = toiletsIcon;
+//    } else if (loc.Genre === 'SOURCE') {
+//      iconToUse = blueIcon;
+    } else if (loc.Type === 'Point d\'Eau') {
+      iconToUse = waterIcon;
+    }
+
+    const marker = L.marker([loc.Lat, loc.Lon], { icon: iconToUse }).addTo(map);
+      // Add a popup with extra fields from the sheet
+      marker.bindPopup(`<STRONG>${loc.Type}</STRONG>`);
+ eauGroup.addLayer(marker);  
+      //marker.off('mouseover');
+      //marker.off('mouseout');
+ //if(canHover){
+   var tt = `<STRONG>${loc.Type}</STRONG>`;
+      marker.bindTooltip(tt, {
+  permanent: false, // default, show only on hover
+  interactive: false,
+  offset: L.point(10, 10),
+  opacity: 0.6,  sticky: true //???
+});
+    // Attach event listeners for each marker
+    marker.on('popupopen', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0);
+    });
+
+    marker.on('popupclose', function() {
+        var tooltip = this.getTooltip();
+        if (tooltip) tooltip.setOpacity(0.6);
+    });
+ //} // if(canHover)
+  } // if (loc.Afficher == '+')
+
+  });
+    // Add the LayerGroup to the map
+eauGroup.addTo(map);
+  })
+  .catch(err => {
+    console.error('Failed to load locations:', err);
+  });
+
+    map.on('zoomend', function() {
+        var zoom = map.getZoom();
+            ascensionsGroup.eachLayer( function (layer){
+                //console.log(layer);
+                if ( zoom >= 13 ) {
+                    layer.openTooltip();
+                } else if ( zoom < 13 ) {
+                    //console.log('remove tooltip');
+                    layer.closeTooltip();
+                }
+            });
+            cafesGroup.eachLayer( function (layer){
+                //console.log(layer);
+                if ( zoom >= 13 ) {
+                    layer.openTooltip();
+                } else if ( zoom < 13 ) {
+                    //console.log('remove tooltip');
+                    layer.closeTooltip();
+                }
+            });
+     });
+    
+</script>
+<!--  <button style="position: fixed; top: 20px; left: 20px; z-index: 1000;">Click Me</button> -->
+<!--<button class="fixed-map-btn" aria-label="Show information">i</button> -->
+</body>
+
+</html>
