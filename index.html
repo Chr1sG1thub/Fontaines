@@ -96,6 +96,7 @@ var fontainesGroup = L.layerGroup();
     locations.forEach(loc => {
 
     var isToggled = markerStates[index] || false;
+      console.error(loc.Name, isToggled);
 
   // Create marker with icon based on saved state
   var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
@@ -109,14 +110,16 @@ var fontainesGroup = L.layerGroup();
     marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
     markerStates[index] = marker.isToggled;           // Update saved states object
     localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
+    
     fontainesGroup.addLayer(marker);  
-});  
+});  //marker.on
 
 
-  });
+  }); //locations.forEach
+    
     // Add the LayerGroup to the map
 fontainesGroup.addTo(map);
-  })
+  }) // .then(locations
   .catch(err => {
     console.error('Failed to load locations:', err);
   });
