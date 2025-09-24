@@ -86,7 +86,7 @@ const fountainredIcon = new L.Icon({
 });
 
 
-//var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {}; //@
+var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
 
 var fontainesGroup = L.layerGroup();
 //fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
@@ -95,27 +95,23 @@ var fontainesGroup = L.layerGroup();
   .then(locations => {
     locations.forEach(loc => {
 
-const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainredIcon }).addTo(map);
-  //    var isToggled = markerStates[index] || false;
-//  var marker = L.marker([loc.Lat, loc.Lon], {icon: isToggled ? fountaingreenIcon : fountainredIcon}).addTo(map);
- // marker.isToggled = isToggled;
-  fontainesGroup.addLayer(marker);  
+    var isToggled = markerStates[index] || false;
 
-//marker.on('click', function() {
-//    marker.isToggled = !marker.isToggled;
- //   marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon);
- //   markerStates[index] = marker.isToggled;
-  //  localStorage.setItem('markerStates', JSON.stringify(markerStates));
-marker.isToggled = false;  // Custom property to track toggle state
+  // Create marker with icon based on saved state
+  var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon }).addTo(map);
 
+  // Store toggle state on marker object for quick access
+  marker.isToggled = isToggled;
+
+  // Add click event to toggle icon and update state
   marker.on('click', function() {
-    if (marker.isToggled) {
-      marker.setIcon(fountainredIcon);
-    } else {
-      marker.setIcon(fountaingreenIcon);
-    }
-   marker.isToggled = !marker.isToggled;
-   });
+    marker.isToggled = !marker.isToggled;             // Flip state
+    marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
+    markerStates[index] = marker.isToggled;           // Update saved states object
+    localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
+    fontainesGroup.addLayer(marker);  
+});  
+
 
   });
     // Add the LayerGroup to the map
