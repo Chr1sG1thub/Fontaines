@@ -70,41 +70,6 @@ navigator.geolocation.watchPosition(
 //    alert(e.message);
 //});
   
-  const mountainIcon = new L.Icon({
-  iconUrl: 'mountain.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});    
-
-   const coffeeIcon = new L.Icon({
-  iconUrl: 'coffee.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});    
-
-  const waterIcon = new L.Icon({
-  iconUrl: 'water.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});
-
-const tapIcon = new L.Icon({
-  iconUrl: 'tap.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});
 
 const fountainIcon = new L.Icon({
   iconUrl: 'fountain.png',
@@ -115,200 +80,29 @@ const fountainIcon = new L.Icon({
 //  shadowSize: [41, 41]
 });
 
-const toiletsIcon = new L.Icon({
-  iconUrl: 'toilets.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});
 
-    // Create an empty LayerGroup
-var ascensionsGroup = L.layerGroup();
+
+var fontainesGroup = L.layerGroup();
 //fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
-  fetch('ascensions.json')
+  fetch('fontaines.json')
   .then(response => response.json())
   .then(locations => {
     locations.forEach(loc => {
 
-    var marker = L.marker([loc.Lat, loc.Lon], { icon: mountainIcon });
-  ascensionsGroup.addLayer(marker);  
-      var ppp = `<STRONG>${loc.Name}</STRONG><BR>Elevation: ${loc.Height}m<BR><BR><a HREF="${loc.Profile}" TARGET="_blank">Profil</a> <BR><I>(Nouvelle Fenêtre)</I>`;
-      if (loc.Profile.length == 0) ppp = `<STRONG>${loc.Name}</STRONG><BR>Elevation: ${loc.Height}m`;
+  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainIcon }).addTo(map);
+  fontainesGroup.addLayer(marker);  
       // Add a popup with extra fields from the sheet
-      marker.bindPopup(ppp);
-      //marker.off('mouseover');
-      //marker.off('mouseout');
-//if(canHover){
-  var tt = `<STRONG>${loc.Name}</STRONG>`;
-      marker.bindTooltip(tt, {
-  className: "ascensionstt",
-  permanent: false, // default, show only on hover
-  interactive: false,
-  offset: L.point(10, 10),
-  opacity: 0.6,  sticky: true //???
-});
-    // Attach event listeners for each marker
-    marker.on('popupopen', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0);
-    });
-
-    marker.on('popupclose', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0.6);
-       var zoom = map.getZoom();
-            ascensionsGroup.eachLayer( function (layer){
-                //console.log(layer);
-                if ( zoom >= 13 ) {
-                    layer.openTooltip();
-                }
-            });
-    });
-//} // if(CanHover)
 
   });
     // Add the LayerGroup to the map
-ascensionsGroup.addTo(map);
+fontainesGroup.addTo(map);
   })
   .catch(err => {
     console.error('Failed to load locations:', err);
   });
 
-    // Create an empty LayerGroup
-var cafesGroup = L.layerGroup();
-//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
-  fetch('cafes.json')
-  .then(response => response.json())
-  .then(locations => {
-    locations.forEach(loc => {
 
-  if (loc.Actif == 'Y') {
-  const marker = L.marker([loc.Lat, loc.Lon], { icon: coffeeIcon }).addTo(map);
-  cafesGroup.addLayer(marker);  
-      // Add a popup with extra fields from the sheet
-      marker.bindPopup(`<STRONG>${loc.Name}</STRONG><BR>${loc.Location}<BR><BR><A HREF="${loc.LinkURL}" TARGET="_blank">Détails</A><BR><I>(Nouvelle Fenêtre)</I>`);
-     //marker.off('mouseover');
-      //marker.off('mouseout');
-//if(canHover){
-      var tt = `<STRONG>${loc.Name}</STRONG><BR>${loc.Location}`;
-      marker.bindTooltip(tt, {
-  className: "cafestt",
-  permanent: false, // default, show only on hover
-  interactive: false,
-  offset: L.point(10, 10),
-  opacity: 0.6,  sticky: true //???
-});
-    // Attach event listeners for each marker
-    marker.on('popupopen', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0);
-    });
-
-    marker.on('popupclose', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0.6);
-      
-       var zoom = map.getZoom();
-            cafesGroup.eachLayer( function (layer){
-                //console.log(layer);
-                if ( zoom >= 13 ) {
-                    layer.openTooltip();
-                }
-            });
-    });
-  //} // if(canHover)
-  } // if (loc.Actif == 'Y')
-
-  });
-    // Add the LayerGroup to the map
-cafesGroup.addTo(map);
-  })
-  .catch(err => {
-    console.error('Failed to load locations:', err);
-  });
-
-    // Create an empty LayerGroup
-var eauGroup = L.layerGroup();
-//fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
-  fetch('eau.json')
-  .then(response => response.json())
-  .then(locations => {
-    locations.forEach(loc => {
-
- if (loc.Display == 'Y') {
-
-    let iconToUse;
-    if (loc.Type === 'Fontaine') {
-      iconToUse = fountainIcon;
-    } else if (loc.Type === 'Robinet') {
-      iconToUse = tapIcon;
-    } else if (loc.Type === 'Toilettes') {
-      iconToUse = toiletsIcon;
-//    } else if (loc.Genre === 'SOURCE') {
-//      iconToUse = blueIcon;
-    } else if (loc.Type === 'Point d\'Eau') {
-      iconToUse = waterIcon;
-    }
-
-    const marker = L.marker([loc.Lat, loc.Lon], { icon: iconToUse }).addTo(map);
-      // Add a popup with extra fields from the sheet
-      marker.bindPopup(`<STRONG>${loc.Type}</STRONG>`);
- eauGroup.addLayer(marker);  
-      //marker.off('mouseover');
-      //marker.off('mouseout');
- //if(canHover){
-   var tt = `<STRONG>${loc.Type}</STRONG>`;
-      marker.bindTooltip(tt, {
-  permanent: false, // default, show only on hover
-  interactive: false,
-  offset: L.point(10, 10),
-  opacity: 0.6,  sticky: true //???
-});
-    // Attach event listeners for each marker
-    marker.on('popupopen', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0);
-    });
-
-    marker.on('popupclose', function() {
-        var tooltip = this.getTooltip();
-        if (tooltip) tooltip.setOpacity(0.6);
-    });
- //} // if(canHover)
-  } // if (loc.Afficher == '+')
-
-  });
-    // Add the LayerGroup to the map
-eauGroup.addTo(map);
-  })
-  .catch(err => {
-    console.error('Failed to load locations:', err);
-  });
-
-    map.on('zoomend', function() {
-        var zoom = map.getZoom();
-            ascensionsGroup.eachLayer( function (layer){
-                //console.log(layer);
-                if ( zoom >= 13 ) {
-                    layer.openTooltip();
-                } else if ( zoom < 13 ) {
-                    //console.log('remove tooltip');
-                    layer.closeTooltip();
-                }
-            });
-            cafesGroup.eachLayer( function (layer){
-                //console.log(layer);
-                if ( zoom >= 13 ) {
-                    layer.openTooltip();
-                } else if ( zoom < 13 ) {
-                    //console.log('remove tooltip');
-                    layer.closeTooltip();
-                }
-            });
-     });
-    
+       
 </script>
 <!--  <button style="position: fixed; top: 20px; left: 20px; z-index: 1000;">Click Me</button> -->
 <!--<button class="fixed-map-btn" aria-label="Show information">i</button> -->
