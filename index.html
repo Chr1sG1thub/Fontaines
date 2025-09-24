@@ -31,47 +31,7 @@
 //const canHover = window.matchMedia('(hover: hover)').matches;
 
 // Store visibility states
-  var ascensionsVisible = true;
-  var cafesVisible = true;
-  var eauVisible = true;
-
-  // Toggle button event handler
-  document.getElementById('toggleAscensions').onclick = function () {
-    if (ascensionsVisible) {
-      map.removeLayer(ascensionsGroup);
-      ascensionsVisible = false;
-      document.getElementById('toggleAscensions').style.opacity = 0.4;
-    } else {
-      map.addLayer(ascensionsGroup);
-      ascensionsVisible = true;
-      document.getElementById('toggleAscensions').style.opacity = 1;
-   }
-  };
-
-  document.getElementById('toggleCafes').onclick = function () {
-    if (cafesVisible) {
-      map.removeLayer(cafesGroup);
-      cafesVisible = false;
-      document.getElementById('toggleCafes').style.opacity = 0.4;
-    } else {
-      map.addLayer(cafesGroup);
-      cafesVisible = true;
-      document.getElementById('toggleCafes').style.opacity = 1;
-   }
-  };
-
-    document.getElementById('toggleEau').onclick = function () {
-    if (eauVisible) {
-      map.removeLayer(eauGroup);
-      eauVisible = false;
-      document.getElementById('toggleEau').style.opacity = 0.4;
-    } else {
-      map.addLayer(eauGroup);
-      eauVisible = true;
-      document.getElementById('toggleEau').style.opacity = 1;
-   }
-  };
-  
+   
     // Set up map at a chosen starting location 
 const map = L.map('map').setView([42.65644, 2.58587], 12);
 
