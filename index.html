@@ -86,6 +86,7 @@ const fountainredIcon = new L.Icon({
 });
 
 
+var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {}; //@
 
 var fontainesGroup = L.layerGroup();
 //fetch('https://script.google.com/macros/s/AKfycbzO1WUGFuJzowiL1nGFKyak7mhSkKXfJ2yqHq9j1eAgYppuvfvBQZbdLG1w21lCmhGEPg/exec')
@@ -94,18 +95,16 @@ var fontainesGroup = L.layerGroup();
   .then(locations => {
     locations.forEach(loc => {
 
-  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainredIcon }).addTo(map);
+    var isToggled = markerStates[index] || false;
+  var marker = L.marker([loc.Lat, loc.Lon], {icon: isToggled ? fountaingreenIcon : fountainredIcon}).addTo(map);
+  marker.isToggled = isToggled;
   fontainesGroup.addLayer(marker);  
 
- marker.isToggled = false;  // Custom property to track toggle state
-
-  marker.on('click', function() {
-    if (marker.isToggled) {
-      marker.setIcon(fountainredIcon);
-    } else {
-      marker.setIcon(fountaingreenIcon);
-    }
+marker.on('click', function() {
     marker.isToggled = !marker.isToggled;
+    marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon);
+    markerStates[index] = marker.isToggled;
+    localStorage.setItem('markerStates', JSON.stringify(markerStates));
   });
 
   });
