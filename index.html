@@ -96,10 +96,18 @@ var fontainesGroup = L.layerGroup();
 
   const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainredIcon }).addTo(map);
   fontainesGroup.addLayer(marker);  
-      // Add a popup with extra fields from the sheet
-marker.on('click', function() {
-    marker.setIcon(fountaingreenIcon); // Switches to the red icon image
-});
+
+ marker.isToggled = false;  // Custom property to track toggle state
+
+  marker.on('click', function() {
+    if (marker.isToggled) {
+      marker.setIcon(fountainredIcon);
+    } else {
+      marker.setIcon(fountaingreenIcon);
+    }
+    marker.isToggled = !marker.isToggled;
+  });
+
   });
     // Add the LayerGroup to the map
 fontainesGroup.addTo(map);
