@@ -95,7 +95,7 @@ var fontainesGroup = L.layerGroup();
   fetch('fontaines.json')
   .then(response => response.json())
   .then(locations => {
-    locations.forEach(loc, index => {
+    locations.forEach((loc, index) => {
 
     var isToggled = markerStates[index] || false;
       console.error(loc.Name, isToggled);
