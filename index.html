@@ -86,10 +86,12 @@ const fountainredIcon = new L.Icon({
 });
 
 
+      console.error('before markerStates');
 var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
 
 var fontainesGroup = L.layerGroup();
 
+      console.error('before fetch');
   fetch('fontaines.json')
   .then(response => response.json())
   .then(locations => {
