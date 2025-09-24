@@ -86,19 +86,19 @@ const fountainredIcon = new L.Icon({
 });
 
 
-      console.error('before markerStates');
+      //console.error('before markerStates');
 var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
 
 var fontainesGroup = L.layerGroup();
 
-      console.error('before fetch');
+      //console.error('before fetch');
   fetch('fontaines.json')
   .then(response => response.json())
   .then(locations => {
     locations.forEach((loc, index) => {
 
     var isToggled = markerStates[index] || false;
-      console.error(loc.Name, isToggled);
+      //console.error(loc.Name, isToggled);
 
   // Create marker with icon based on saved state
   var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
@@ -113,10 +113,10 @@ var fontainesGroup = L.layerGroup();
     markerStates[index] = marker.isToggled;           // Update saved states object
     localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
     
+);  //marker.on
+
     fontainesGroup.addLayer(marker);  
-});  //marker.on
-
-
+}
   }); //locations.forEach
     
     // Add the LayerGroup to the map
