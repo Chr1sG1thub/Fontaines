@@ -94,7 +94,7 @@ var fontainesGroup = L.layerGroup();
   .then(locations => {
     locations.forEach(loc => {
 
-  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainred }).addTo(map);
+  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainredIcon }).addTo(map);
   fontainesGroup.addLayer(marker);  
       // Add a popup with extra fields from the sheet
 
