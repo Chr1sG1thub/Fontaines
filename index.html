@@ -67,8 +67,17 @@ navigator.geolocation.watchPosition(
 //});
   
 
-const fountainIcon = new L.Icon({
-  iconUrl: 'fountain.png',
+const fountaingreenIcon = new L.Icon({
+  iconUrl: 'fountaingreen.png',
+//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+  popupAnchor: [1, -30],
+//  shadowSize: [41, 41]
+});
+
+const fountainredIcon = new L.Icon({
+  iconUrl: 'fountainred.png',
 //  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [30, 30],
   iconAnchor: [15, 15],
@@ -85,7 +94,7 @@ var fontainesGroup = L.layerGroup();
   .then(locations => {
     locations.forEach(loc => {
 
-  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainIcon }).addTo(map);
+  const marker = L.marker([loc.Lat, loc.Lon], { icon: fountainred }).addTo(map);
   fontainesGroup.addLayer(marker);  
       // Add a popup with extra fields from the sheet
 
