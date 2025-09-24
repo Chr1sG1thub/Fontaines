@@ -113,10 +113,10 @@ var fontainesGroup = L.layerGroup();
     markerStates[index] = marker.isToggled;           // Update saved states object
     localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
     
-);  //marker.on
+  });  //marker.on
 
-    fontainesGroup.addLayer(marker);  
-}
+    fontainesGroup.addLayer(marker);
+      
   }); //locations.forEach
     
     // Add the LayerGroup to the map
