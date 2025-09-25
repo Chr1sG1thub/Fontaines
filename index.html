@@ -21,9 +21,9 @@
   <div id="map"></div>
 
   <div id="fixed-data">
-    <div id="line1">1</div>
-    <div id="line2">2</div>
-    <div id="line3">3</div>
+    <div id="total">1</div>
+    <div id="found">2</div>
+    <div id="tofind">3</div>
   </div>
 
     <script>
@@ -111,7 +111,7 @@
       
       }); //locations.forEach
 
-      console.info(fontaineCount, foundCount, toFindCount);
+      console.info(fontaineCount, foundCount);
 
       
 
@@ -126,9 +126,9 @@
 
   console.info(fontaineCount, foundCount, toFindCount);
       
-  document.getElementById("line1").textContent = fontaineCount;
-  document.getElementById("line2").textContent = foundCount;
-  document.getElementById("line3").textContent = toFindCount;
+  document.getElementById("total").textContent = fontaineCount;
+  document.getElementById("found").textContent = foundCount;
+  document.getElementById("tofind").textContent = toFindCount;
 
   </script>
   
