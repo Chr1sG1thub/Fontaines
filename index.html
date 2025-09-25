@@ -112,6 +112,16 @@ T</style>
   // Add click event to toggle icon and update state
         marker.on('click', function() {
           marker.isToggled = !marker.isToggled;             // Flip state
+          if (marker.isToggled) {
+            foundCount = foundCount + 1;
+            toFindCount = toFindCount - 1;
+          else {
+            foundCount = foundCount - 1;
+            toFindCount = toFindCount + 1;
+          }
+          document.getElementById("found").textContent = "Found: "+foundCount;
+          document.getElementById("tofind").textContent = "To Find: "+toFindCount;
+          
           marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
           markerStates[index] = marker.isToggled;           // Update saved states object
           localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
