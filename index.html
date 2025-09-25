@@ -39,7 +39,7 @@
   </div>
 
   <progress id="prog" max="15" value="5" style="position: fixed;
-  top: 70px;  right: 20px;"></progress>
+  top: 100px;  right: 20px; z-index: 1000;"></progress>
 
     <script>
 
@@ -95,8 +95,9 @@
   var foundCount = 0;
   var fontaineCount = 0;
   var toFindCount = 0;
-  
-  
+
+  var progressBar = document.getElementById('prog');
+          
   fetch('fontaines.json')
     .then(response => response.json())
     .then(locations => {
@@ -125,7 +126,10 @@
           }
           document.getElementById("found").textContent = "Found: "+foundCount;
           document.getElementById("tofind").textContent = "To Find: "+toFindCount;
-          
+
+          progressBar.max = fontaineCount;
+          progressBar.value = foundCount;
+
           marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
           markerStates[index] = marker.isToggled;           // Update saved states object
           localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
@@ -145,7 +149,10 @@
   document.getElementById("total").textContent = "Total: "+fontaineCount;
   document.getElementById("found").textContent = "Found: "+foundCount;
   document.getElementById("tofind").textContent = "To Find: "+toFindCount;
-  
+
+           progressBar.max = fontaineCount;
+          progressBar.value = foundCount;
+
 
     // Add the LayerGroup to the map
       fontainesGroup.addTo(map);
