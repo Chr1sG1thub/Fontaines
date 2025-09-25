@@ -9,11 +9,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     #map { height: 800px; width: 100%; }
-
   </style>
-  
 
 </head>
 
@@ -23,117 +22,88 @@
 
   <script>
 
-    // Returns true if the device supports hovering (i.e., mouse/trackpad)
-//const canHover = window.matchMedia('(hover: hover)').matches;
+    const map = L.map('map').setView([42.640356, 2.522745], 15);
 
-// Store visibility states
-   
-    // Set up map at a chosen starting location 
-const map = L.map('map').setView([42.640356, 2.522745], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 20,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 20,
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+    const locationIcon = new L.Icon({
+      iconUrl: 'location.ico',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });    
 
-  const locationIcon = new L.Icon({
-  iconUrl: 'location.ico',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
- // popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});    
-let userMarker = null;
-navigator.geolocation.watchPosition(
-  function(position) {
-    var latlng = [position.coords.latitude, position.coords.longitude];
-    if (!userMarker) {
-      userMarker = L.marker(latlng, { icon: locationIcon }).addTo(map);
-      map.panTo(latlng);
-    } else {
-      userMarker.setLatLng(latlng);
-    }
-  },
-  function(error) {
+    let userMarker = null;
+    navigator.geolocation.watchPosition(
+      function(position) {
+        var latlng = [position.coords.latitude, position.coords.longitude];
+        if (!userMarker) {
+          userMarker = L.marker(latlng, { icon: locationIcon }).addTo(map);
+          map.panTo(latlng);
+        } else {
+          userMarker.setLatLng(latlng);
+        }
+      },
+      function(error) {
     //alert("Geolocation failed: " + error.message);
-  },
-  {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000}
-);
-
-// Optionally handle location error
-//map.on('locationerror', function(e) {
-//    alert(e.message);
-//});
-  
-
-const fountaingreenIcon = new L.Icon({
-  iconUrl: 'fountaingreen.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});
-
-const fountainredIcon = new L.Icon({
-  iconUrl: 'fountainred.png',
-//  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-  popupAnchor: [1, -30],
-//  shadowSize: [41, 41]
-});
+      },
+    {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000}
+  );
 
 
-      //console.error('before markerStates');
-var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
+  const fountaingreenIcon = new L.Icon({
+    iconUrl: 'fountaingreen.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [1, -30],
+  });
 
-var fontainesGroup = L.layerGroup();
+  const fountainredIcon = new L.Icon({
+    iconUrl: 'fountainred.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [1, -30],
+  });
 
-      //console.error('before fetch');
+  var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
+
+  var fontainesGroup = L.layerGroup();
+
   fetch('fontaines.json')
-  .then(response => response.json())
-  .then(locations => {
-    locations.forEach((loc, index) => {
+    .then(response => response.json())
+    .then(locations => {
+      locations.forEach((loc, index) => {
 
-    var isToggled = markerStates[index] || false;
-      //console.error(loc.Name, isToggled);
-
-  // Create marker with icon based on saved state
-  var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
-
-  marker.bindPopup(`<STRONG>${loc.Name}</STRONG>`);
-     
+        var isToggled = markerStates[index] || false;
+        var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
 
   // Store toggle state on marker object for quick access
-  marker.isToggled = isToggled;
+        marker.isToggled = isToggled;
 
   // Add click event to toggle icon and update state
-  marker.on('click', function() {
-    marker.isToggled = !marker.isToggled;             // Flip state
-    marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
-    markerStates[index] = marker.isToggled;           // Update saved states object
-    localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
+        marker.on('click', function() {
+          marker.isToggled = !marker.isToggled;             // Flip state
+          marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
+          markerStates[index] = marker.isToggled;           // Update saved states object
+          localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
     
-  });  //marker.on
+        });  //marker.on
 
-    fontainesGroup.addLayer(marker);
+        fontainesGroup.addLayer(marker);
       
-  }); //locations.forEach
+      }); //locations.forEach
     
     // Add the LayerGroup to the map
-fontainesGroup.addTo(map);
-  }) // .then(locations
-  .catch(err => {
+      fontainesGroup.addTo(map);
+    }) // .then(locations
+    .catch(err => {
     console.error('Failed to load locations:', err);
   });
 
+  </script>
 
-       
-</script>
-<!--  <button style="position: fixed; top: 20px; left: 20px; z-index: 1000;">Click Me</button> -->
-<!--<button class="fixed-map-btn" aria-label="Show information">i</button> -->
-</body>
+  </body>
 
 </html>
