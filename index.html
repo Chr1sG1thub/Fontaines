@@ -111,7 +111,7 @@
       
       }); //locations.forEach
 
-      //console.info(fontaineCount, foundCount);
+      console.info(fontaineCount, foundCount, toFindCount);
 
       
 
@@ -124,6 +124,8 @@
   
   toFindCount = fontaineCount - foundCount;
 
+  console.info(fontaineCount, foundCount, toFindCount);
+      
   document.getElementById("line1").textContent = fontaineCount;
   document.getElementById("line2").textContent = foundCount;
   document.getElementById("line3").textContent = toFindCount;
