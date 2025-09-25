@@ -103,8 +103,11 @@
       
       }); //locations.forEach
 
-      console.info(fontaineCount, foundCount);
-    
+      //console.info(fontaineCount, foundCount);
+
+      var toFindCound = fontaineCount - foundCount;
+      
+
     // Add the LayerGroup to the map
       fontainesGroup.addTo(map);
     }) // .then(locations
@@ -113,6 +116,12 @@
   });
 
   </script>
+  
+  <div id="fixed-data">
+    <div id="line1">Total : `${fountainCount}`</div>
+    <div id="line2">Found : `${foundCount}`</div>
+    <div id="line3">To Find : `${toFindCount}`</div>
+  </div>
 
   </body>
 
