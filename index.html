@@ -79,6 +79,8 @@
 
   var foundCount = 0;
   var fontaineCount = 0;
+  var toFindCound = 0;
+  
   
   fetch('fontaines.json')
     .then(response => response.json())
@@ -111,7 +113,6 @@
 
       //console.info(fontaineCount, foundCount);
 
-      var toFindCound = fontaineCount - foundCount;
       
 
     // Add the LayerGroup to the map
@@ -120,6 +121,8 @@
     .catch(err => {
     console.error('Failed to load locations:', err);
   });
+  
+  toFindCound = fontaineCount - foundCount;
 
   document.getElementById("line1").innerHTML = `Total : ${fontaineCount}`;
   document.getElementById("line2").innerHTML = `Found : ${foundCount}`;
