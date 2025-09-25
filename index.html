@@ -103,6 +103,9 @@ var fontainesGroup = L.layerGroup();
   // Create marker with icon based on saved state
   var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
 
+  marker.bindPopup(`<STRONG>${loc.Name}</STRONG>`);
+     
+
   // Store toggle state on marker object for quick access
   marker.isToggled = isToggled;
 
