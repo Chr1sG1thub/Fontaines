@@ -113,7 +113,14 @@
 
       console.info(fontaineCount, foundCount);
 
+      toFindCount = fontaineCount - foundCount;
+
+  console.info(fontaineCount, foundCount, toFindCount);
       
+  document.getElementById("total").textContent = fontaineCount;
+  document.getElementById("found").textContent = foundCount;
+  document.getElementById("tofind").textContent = toFindCount;
+  
 
     // Add the LayerGroup to the map
       fontainesGroup.addTo(map);
@@ -122,13 +129,6 @@
     console.error('Failed to load locations:', err);
   }); // fetch
   
-  toFindCount = fontaineCount - foundCount;
-
-  console.info(fontaineCount, foundCount, toFindCount);
-      
-  document.getElementById("total").textContent = fontaineCount;
-  document.getElementById("found").textContent = foundCount;
-  document.getElementById("tofind").textContent = toFindCount;
 
   </script>
   
