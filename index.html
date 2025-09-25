@@ -114,7 +114,7 @@ T</style>
           marker.isToggled = !marker.isToggled;             // Flip state
           if (marker.isToggled) {
             foundCount = foundCount + 1;
-            toFindCount = toFindCount - 1;
+            toFindCount = toFindCount - 1;}
           else {
             foundCount = foundCount - 1;
             toFindCount = toFindCount + 1;
@@ -132,11 +132,11 @@ T</style>
       
       }); //locations.forEach
 
-      console.info(fontaineCount, foundCount);
+      //console.info(fontaineCount, foundCount);
 
       toFindCount = fontaineCount - foundCount;
 
-  console.info(fontaineCount, foundCount, toFindCount);
+  //console.info(fontaineCount, foundCount, toFindCount);
       
   document.getElementById("total").textContent = "Total: "+fontaineCount;
   document.getElementById("found").textContent = "Found: "+foundCount;
