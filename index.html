@@ -71,12 +71,20 @@
 
   var fontainesGroup = L.layerGroup();
 
+  var foundCount = 0;
+  var fontaineCount = 0;
+  
   fetch('fontaines.json')
     .then(response => response.json())
     .then(locations => {
       locations.forEach((loc, index) => {
 
+        fontaineCount = fontaineCount + 1;
+
         var isToggled = markerStates[index] || false;
+
+        if (isToggled) foundCount = foundCount + 1;
+
         var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
 
   // Store toggle state on marker object for quick access
@@ -94,6 +102,8 @@
         fontainesGroup.addLayer(marker);
       
       }); //locations.forEach
+
+      console.info(fontaineCount, foundCount);
     
     // Add the LayerGroup to the map
       fontainesGroup.addTo(map);
