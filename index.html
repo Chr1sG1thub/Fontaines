@@ -124,9 +124,9 @@
   
   toFindCound = fontaineCount - foundCount;
 
-  document.getElementById("line1").innerHTML = `Total : ${fontaineCount}`;
-  document.getElementById("line2").innerHTML = `Found : ${foundCount}`;
-  document.getElementById("line3").innerHTML = `To Find : ${toFindCount}`;
+  document.getElementById("line1").textContent = fontaineCount;
+  document.getElementById("line2").textContent = foundCount;
+  document.getElementById("line3").textContent = toFindCount;
 
   </script>
   
