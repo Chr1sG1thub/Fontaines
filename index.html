@@ -120,9 +120,9 @@
     }) // .then(locations
     .catch(err => {
     console.error('Failed to load locations:', err);
-  });
+  }); // fetch
   
-  toFindCound = fontaineCount - foundCount;
+  toFindCount = fontaineCount - foundCount;
 
   document.getElementById("line1").textContent = fontaineCount;
   document.getElementById("line2").textContent = foundCount;
