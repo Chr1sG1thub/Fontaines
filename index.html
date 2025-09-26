@@ -13,18 +13,18 @@
   <style>
     #map { height: 800px; width: 100%; }
   
-  #fixed-data {
-  font-family: sans-serif;
-  position: fixed;
-  top: 20px; /* Distance from top of the viewport */
-  right: 40px; /* Distance from left of the viewport */
-  background: white;
-  padding: 10px;
-  border: 1px solid #999;
-  z-index: 1000;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-}
-</style>
+    #fixed-data {
+    font-family: sans-serif;
+    position: fixed;
+    top: 20px; /* Distance from top of the viewport */
+    right: 40px; /* Distance from left of the viewport */
+    background: white;
+    padding: 10px;
+    border: 1px solid #999;
+    z-index: 1000;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
 
 </head>
 
@@ -39,9 +39,9 @@
   </div>
 
   <progress id="prog" max="15" value="5" style="position: fixed;
-  top: 100px;  right: 20px; z-index: 1000;"></progress>
+    top: 100px;  right: 20px; z-index: 1000;"></progress>
 
-    <script>
+  <script>
 
     const map = L.map('map').setView([42.640356, 2.522745], 15);
 
@@ -72,7 +72,6 @@
       },
     {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000}
   );
-
 
   const fountaingreenIcon = new L.Icon({
     iconUrl: 'fountaingreen.png',
@@ -146,13 +145,12 @@
 
   //console.info(fontaineCount, foundCount, toFindCount);
       
-  document.getElementById("total").textContent = "Total: "+fontaineCount;
-  document.getElementById("found").textContent = "Found: "+foundCount;
-  document.getElementById("tofind").textContent = "To Find: "+toFindCount;
+      document.getElementById("total").textContent = "Total: "+fontaineCount;
+      document.getElementById("found").textContent = "Found: "+foundCount;
+      document.getElementById("tofind").textContent = "To Find: "+toFindCount;
 
-           progressBar.max = fontaineCount;
-          progressBar.value = foundCount;
-
+      progressBar.max = fontaineCount;
+      progressBar.value = foundCount;
 
     // Add the LayerGroup to the map
       fontainesGroup.addTo(map);
@@ -160,10 +158,8 @@
     .catch(err => {
     console.error('Failed to load locations:', err);
   }); // fetch
-  
 
   </script>
-  
 
   </body>
 
