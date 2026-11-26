@@ -197,19 +197,18 @@
     <p class="status" id="status" role="status">Loading fountain locations…</p>
   </section>
 
-  <div class="map-credit">Map data © OpenStreetMap · CARTO</div>
+  <div class="map-credit">Map illustration © Stamen · Map data © OpenStreetMap</div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const map = L.map('map', { zoomControl: false }).setView([42.640356, 2.522745], 15);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // CARTO Voyager has a brighter, more illustrated colour palette than the
-    // standard OSM layer, while retaining real streets and map detail.
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 20,
-      subdomains: 'abcd',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    // A hand-painted storybook basemap, with real-world coordinates and
+    // fountain markers preserved. Watercolor tiles are best at village scale.
+    L.tileLayer('https://tiles-eu.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg', {
+      maxZoom: 16,
+      attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://stamen.com/">Stamen Design</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
     const locationIcon = new L.Icon({
