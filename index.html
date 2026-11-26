@@ -31,6 +31,13 @@
     }
     #map { position: absolute; inset: 0; z-index: 1; background: #e9eee8; }
     .leaflet-container { font: inherit; }
+    /* A brighter, more illustrated basemap to suit the treasure-hunt theme. */
+    .leaflet-tile {
+      filter: saturate(1.22) contrast(1.035) brightness(1.025);
+    }
+    .leaflet-marker-icon {
+      filter: drop-shadow(0 3px 2px rgba(39, 32, 74, .28));
+    }
     .panel {
       position: absolute;
       z-index: 500;
@@ -190,16 +197,19 @@
     <p class="status" id="status" role="status">Loading fountain locations…</p>
   </section>
 
-  <div class="map-credit">Map data © OpenStreetMap contributors</div>
+  <div class="map-credit">Map data © OpenStreetMap · CARTO</div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const map = L.map('map', { zoomControl: false }).setView([42.640356, 2.522745], 15);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // CARTO Voyager has a brighter, more illustrated colour palette than the
+    // standard OSM layer, while retaining real streets and map detail.
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 20,
-      attribution: '© OpenStreetMap contributors'
+      subdomains: 'abcd',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
 
     const locationIcon = new L.Icon({
