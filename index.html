@@ -1,378 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
+  
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#ffdf4d">
-  <meta name="description" content="Explore the fountains and keep track of the ones you've found.">
-  <title>Fontaines · The great fountain hunt</title>
-  <link rel="icon" href="location.ico">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #20342d;
-      --muted: #687a70;
-      --paper: #f5f7f2;
-      --card: #ffffff;
-      --line: #e2e9e1;
-      --green: #25845a;
-      --green-soft: #e3f3e9;
-      --red: #d86b58;
-      --shadow: 0 8px 28px rgba(31, 55, 43, .10);
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--ink);
-      background: var(--paper);
-      overflow: hidden;
-    }
-    #map { position: absolute; inset: 0; z-index: 1; background: #e9eee8; }
-    .leaflet-container { font: inherit; }
-    /* A brighter, more illustrated basemap to suit the treasure-hunt theme. */
-    .leaflet-tile {
-      filter: saturate(1.22) contrast(1.035) brightness(1.025);
-    }
-    .leaflet-marker-icon {
-      filter: drop-shadow(0 3px 2px rgba(39, 32, 74, .28));
-    }
-    .panel {
-      position: absolute;
-      z-index: 500;
-      top: max(16px, env(safe-area-inset-top));
-      right: max(16px, env(safe-area-inset-right));
-      width: min(310px, calc(100vw - 32px));
-      padding: 18px;
-      border: 1px solid rgba(226,233,225,.9);
-      border-radius: 20px;
-      background: rgba(255,255,255,.96);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-    }
-    .eyebrow {
-      margin: 0 0 5px;
-      color: var(--green);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-    h1 { margin: 0; font-size: 23px; line-height: 1.15; letter-spacing: -.04em; }
-    .subtitle { margin: 6px 0 16px; color: var(--muted); font-size: 13px; }
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .stat {
-      min-width: 0;
-      padding: 10px 8px;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: #fbfcfa;
-      text-align: center;
-    }
-    .stat strong { display: block; font-size: 23px; line-height: 1.15; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .stat span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-    .stat.found strong { color: var(--green); }
-    .progress-head { display: flex; justify-content: space-between; gap: 12px; margin: 17px 0 7px; font-size: 12px; font-weight: 700; }
-    #progress-label { color: var(--muted); font-weight: 600; }
-    .progress-track { height: 9px; overflow: hidden; border-radius: 99px; background: #edf1eb; }
-    #progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #42a66e, #218255); transition: width .25s ease; }
-    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 15px; color: var(--muted); font-size: 11px; }
-    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-    .dot.todo { background: var(--red); }
-    .dot.done { background: var(--green); }
-    .actions { display: flex; gap: 8px; margin-top: 17px; }
-    button {
-      min-height: 40px; padding: 0 13px; border: 1px solid var(--line);
-      border-radius: 11px; background: #fff; color: var(--ink);
-      font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
-      transition: transform .15s ease, background .15s ease;
-    }
-    button:active { transform: scale(.97); }
-    button.primary { flex: 1; border-color: var(--green); background: var(--green); color: white; }
-    button:focus-visible { outline: 3px solid rgba(37,132,90,.25); outline-offset: 2px; }
-    .status { min-height: 16px; margin: 11px 0 0; color: var(--muted); font-size: 11px; }
-    .map-credit {
-      position: absolute; z-index: 450; left: 12px; bottom: max(12px, env(safe-area-inset-bottom));
-      padding: 6px 9px; border-radius: 9px; background: rgba(255,255,255,.9);
-      color: #52645a; font-size: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.08);
-    }
-    @media (max-width: 600px) {
-      .panel {
-        top: max(10px, env(safe-area-inset-top)); right: 10px; left: 10px;
-        width: auto; padding: 14px 15px; border-radius: 17px;
-      }
-      h1 { font-size: 20px; }
-      .subtitle { margin: 4px 0 12px; font-size: 12px; }
-      .stat { padding: 8px 5px; }
-      .stat strong { font-size: 20px; }
-      .progress-head { margin-top: 12px; }
-      .legend { margin-top: 11px; }
-      .actions { margin-top: 12px; }
-      button { min-height: 38px; }
-      .map-credit { bottom: max(10px, env(safe-area-inset-bottom)); }
-    }
-  </style>
-
-  <style>
-    :root { --ink:#27204a; --muted:#716b87; --green:#168b75; --red:#f05d58; }
-    body { background:#fff3cf; }
-    .panel { width:min(340px,calc(100vw - 32px)); padding:20px; border:3px solid #fff; border-radius:25px; background:#fffdf5; box-shadow:0 7px 0 rgba(79,55,137,.13),0 18px 38px rgba(52,39,91,.18); }
-    .panel::after { content:"☀️"; position:absolute; top:13px; right:16px; font-size:29px; transform:rotate(12deg); pointer-events:none; }
-    .eyebrow { display:inline-block; margin:0 0 8px; padding:6px 10px; border-radius:999px; background:#ffe4ef; color:#c53f78; font-size:10px; letter-spacing:.12em; }
-    h1 { color:#4932a1; font-size:30px; font-weight:900; letter-spacing:-.055em; text-shadow:2px 2px 0 #e8dcff; }
-    .subtitle { max-width:265px; margin:7px 0 17px; color:#716b87; font-size:13px; line-height:1.45; }
-    .stats { gap:7px; }
-    .stat { padding:11px 6px 10px; border:2px solid transparent; border-radius:16px; background:#f1ebff; }
-    .stat:nth-child(2) { background:#e0f7e9; }
-    .stat:nth-child(3) { background:#fff0c2; }
-    .stat strong { color:#4932a1; font-size:27px; font-weight:900; }
-    .stat.found strong { color:#12815f; }
-    .stat span { color:#69617f; font-size:9px; letter-spacing:.08em; }
-    .progress-head { margin:17px 0 8px; color:#4932a1; font-size:12px; font-weight:850; }
-    #progress-label { padding:3px 8px; border-radius:99px; background:#ffe0ec; color:#c53f78; font-weight:900; }
-    .progress-track { height:13px; border:2px solid #fff; background:#eee8fb; box-shadow:inset 0 1px 3px rgba(47,31,91,.12); }
-    #progress-fill { background:linear-gradient(90deg,#ff8ab3 0%,#ffb64d 48%,#42c99a 100%); }
-    .legend { gap:15px; color:#716b87; font-size:11px; font-weight:700; }
-    .dot { width:11px; height:11px; box-shadow:0 0 0 2px white; }
-    .dot.todo { background:#f05d58; } .dot.done { background:#18a77c; }
-    .actions { gap:9px; margin-top:16px; }
-    button { min-height:43px; border:2px solid #eee5ff; border-radius:14px; background:#fff; color:#4932a1; font-size:12px; font-weight:850; box-shadow:0 3px 0 #e8e0f7; }
-    button.primary { border:2px solid #ef6d91; background:linear-gradient(135deg,#ff8ab3,#ff6f83); color:#fff; box-shadow:0 4px 0 #d9517b; }
-    button:not(.primary) { background:#fff1ad; border-color:#ffe18a; box-shadow:0 4px 0 #f2d16d; }
-    button:hover { filter:saturate(1.12) brightness(1.02); transform:translateY(-1px); }
-    button:active { transform:translateY(2px) scale(.98); box-shadow:none; }
-    button:focus-visible { outline:3px solid #7554d8; outline-offset:3px; }
-    .status { min-height:17px; margin:13px 0 0; color:#756b8f; font-size:11px; font-weight:650; }
-    .map-credit { border:2px solid #fff; border-radius:999px; background:rgba(255,253,245,.95); color:#5e5480; font-weight:700; }
-    .leaflet-control-zoom a { border:2px solid #fff !important; border-radius:12px !important; background:#fffdf5 !important; color:#4932a1 !important; box-shadow:0 3px 0 rgba(79,55,137,.16); }
-    .leaflet-popup-content-wrapper,.leaflet-popup-tip { border:2px solid #fff; border-radius:15px; background:#fffdf5; color:#27204a; box-shadow:0 5px 0 rgba(79,55,137,.12); }
-    .leaflet-popup-content { line-height:1.5; }
-    @media(max-width:600px) {
-      .panel { padding:15px 15px 13px; border-radius:21px; }
-      .panel::after { top:9px; right:13px; font-size:25px; }
-      h1 { font-size:25px; }
-      .subtitle { max-width:90%; margin:4px 0 11px; }
-      .stat { padding:8px 5px; border-radius:13px; }
-      .stat strong { font-size:23px; }
-      .progress-head { margin-top:12px; }
-      .legend { margin-top:10px; }
-      .actions { margin-top:11px; }
-      button { min-height:40px; }
-    }
-    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; } }
-  </style>
-</head>
-<body>
-  <div id="map" aria-label="Map showing fountains to discover"></div>
-
-  <section class="panel" aria-label="Quest progress ✨">
-    <p class="eyebrow">✦ THE GREAT FOUNTAIN HUNT ✦</p>
-    <h1>Fontaines! 💦</h1>
-    <p class="subtitle">A little adventure around town. Spot a fountain? Tap its marker and claim your discovery!</p>
-
-    <div class="stats" aria-live="polite">
-      <div class="stat"><strong id="total">—</strong><span>Total</span></div>
-      <div class="stat found"><strong id="found">—</strong><span>Found</span></div>
-      <div class="stat"><strong id="tofind">—</strong><span>Remaining</span></div>
-    </div>
-
-    <div class="progress-head">
-      <span>Discovery progress</span>
-      <span id="progress-label">0%</span>
-    </div>
-    <div class="progress-track" role="progressbar" aria-label="Fountains found" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" id="progress">
-      <div id="progress-fill"></div>
-    </div>
-
-    <div class="legend">
-      <span class="legend-item"><i class="dot todo"></i>To find</span>
-      <span class="legend-item"><i class="dot done"></i>Found</span>
-    </div>
-    <div class="actions">
-      <button class="primary" id="locate-button" type="button">📍 Find me</button>
-      <button id="reset-button" type="button">↻ Start over</button>
-    </div>
-    <p class="status" id="status" role="status">Loading fountain locations…</p>
-  </section>
-
-  <div class="map-credit">Map data © OpenStreetMap contributors</div>
-
+  <title>Fontaines</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map', { zoomControl: false }).setView([42.640356, 2.522745], 15);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // OpenStreetMap standard tiles are available without an API key.
-    // Keep the map dependable; the playful look comes from the app interface
-    // and custom fountain markers rather than a credentialed tile provider.
+  <style>
+    #map { height: 800px; width: 100%; }
+  
+    #fixed-data {
+    font-family: sans-serif;
+    position: fixed;
+    top: 20px; /* Distance from top of the viewport */
+    right: 40px; /* Distance from left of the viewport */
+    background: white;
+    padding: 10px;
+    border: 1px solid #999;
+    z-index: 1000;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+
+</head>
+
+<body>
+  
+  <div id="map"></div>
+
+  <div id="fixed-data">
+    <div id="total">1</div>
+    <div id="found">2</div>
+    <div id="tofind">3</div>
+  </div>
+
+  <progress id="prog" max="15" value="5" style="position: fixed;
+    top: 100px;  right: 20px; z-index: 1000;"></progress>
+
+  <script>
+
+    const map = L.map('map').setView([42.640356, 2.522745], 15);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      maxZoom: 20,
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
     const locationIcon = new L.Icon({
-      iconUrl: 'location.ico', iconSize: [22, 22], iconAnchor: [11, 11]
-    });
-    const foundIcon = new L.Icon({
-      iconUrl: 'fountaingreen.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -26]
-    });
-    const todoIcon = new L.Icon({
-      iconUrl: 'fountainred.png', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -26]
-    });
-
-    const storageKey = 'markerStates';
-    let markerStates = {};
-    try { markerStates = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; }
-    catch (error) { markerStates = {}; }
+      iconUrl: 'location.ico',
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+    });    
 
     let userMarker = null;
-    let watchId = null;
-    let latestUserPoint = null;
-    let fountainCount = 0;
-    let foundCount = 0;
-    const markers = [];
-    const group = L.layerGroup().addTo(map);
-
-    const totalEl = document.getElementById('total');
-    const foundEl = document.getElementById('found');
-    const remainingEl = document.getElementById('tofind');
-    const progress = document.getElementById('progress');
-    const progressFill = document.getElementById('progress-fill');
-    const progressLabel = document.getElementById('progress-label');
-    const statusEl = document.getElementById('status');
-
-    function updateProgress() {
-      const remaining = fountainCount - foundCount;
-      const percent = fountainCount ? Math.round(foundCount / fountainCount * 100) : 0;
-      totalEl.textContent = fountainCount;
-      foundEl.textContent = foundCount;
-      remainingEl.textContent = remaining;
-      progressFill.style.width = percent + '%';
-      progressLabel.textContent = percent + '%';
-      progress.setAttribute('aria-valuemax', fountainCount);
-      progress.setAttribute('aria-valuenow', foundCount);
-      statusEl.textContent = remaining === 0 && fountainCount
-        ? 'Amazing! You found them all! 🎉'
-        : foundCount ? 'Nice one! Your discoveries are saved. ⭐' : 'Ready, explorer? Tap a fountain when you find it. 🧭';
-    }
-
-    function saveStates() {
-      try { localStorage.setItem(storageKey, JSON.stringify(markerStates)); }
-      catch (error) { statusEl.textContent = 'Unable to save progress on this device.'; }
-    }
-
-    function toggleMarker(marker, index, location) {
-      marker.isFound = !marker.isFound;
-      marker.setIcon(marker.isFound ? foundIcon : todoIcon);
-      markerStates[index] = marker.isFound;
-      foundCount += marker.isFound ? 1 : -1;
-      saveStates();
-      updateProgress();
-      marker.setPopupContent('<strong>' + escapeHtml(location.Name || 'Fountain') + '</strong><br>' +
-        (marker.isFound ? 'Marked as found ✓' : 'Still to find') +
-        '<br><small>Tap marker to change status</small>');
-      marker.openPopup();
-    }
-
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, char => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[char]));
-    }
-
-    fetch('fontaines.json')
-      .then(response => {
-        if (!response.ok) throw new Error('Could not load fountain locations (' + response.status + ').');
-        return response.json();
-      })
-      .then(locations => {
-        fountainCount = locations.length;
-        locations.forEach((location, index) => {
-          const isFound = markerStates[index] === true;
-          if (isFound) foundCount++;
-          const marker = L.marker([location.Lat, location.Lon], {
-            icon: isFound ? foundIcon : todoIcon,
-            title: location.Name || 'Fountain',
-            alt: location.Name || 'Fountain'
-          });
-          marker.isFound = isFound;
-          marker.bindPopup('<strong>' + escapeHtml(location.Name || 'Fountain') + '</strong><br>' +
-            (isFound ? 'Marked as found ✓' : 'Still to find') +
-            '<br><small>Tap marker to change status</small>');
-          marker.on('click', () => toggleMarker(marker, index, location));
-          markers.push(marker);
-          group.addLayer(marker);
-        });
-        updateProgress();
-        if (markers.length) {
-          const bounds = group.getBounds();
-          map.fitBounds(bounds, { paddingTopLeft: [25, 210], paddingBottomRight: [25, 35], maxZoom: 16 });
-        }
-        startLocationWatch();
-      })
-      .catch(error => {
-        console.error('Failed to load locations:', error);
-        statusEl.textContent = 'Could not load the fountains. Check your connection and reload.';
-      });
-
-    function startLocationWatch() {
-      if (!('geolocation' in navigator)) return;
-      watchId = navigator.geolocation.watchPosition(position => {
-        latestUserPoint = [position.coords.latitude, position.coords.longitude];
+    navigator.geolocation.watchPosition(
+      function(position) {
+        var latlng = [position.coords.latitude, position.coords.longitude];
         if (!userMarker) {
-          userMarker = L.marker(latestUserPoint, { icon: locationIcon, title: 'Your location' }).addTo(map);
-          map.panTo(latestUserPoint);
+          userMarker = L.marker(latlng, { icon: locationIcon }).addTo(map);
+          map.panTo(latlng);
         } else {
-          userMarker.setLatLng(latestUserPoint);
+          userMarker.setLatLng(latlng);
         }
-      }, error => {
-        console.info('Location update unavailable:', error.message);
-      }, { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
-    }
+      },
+      function(error) {
+    //alert("Geolocation failed: " + error.message);
+      },
+    {enableHighAccuracy: false, timeout: 5000, maximumAge: 10000}
+  );
 
-    function locateUser() {
-      if (latestUserPoint) {
-        map.setView(latestUserPoint, Math.max(map.getZoom(), 16), { animate: true });
-        statusEl.textContent = 'Your location is shown on the map.';
-        return;
-      }
-      if (!('geolocation' in navigator)) {
-        statusEl.textContent = 'Location is not available in this browser.';
-        return;
-      }
-      statusEl.textContent = 'Finding your location…';
-      navigator.geolocation.getCurrentPosition(position => {
-        const point = [position.coords.latitude, position.coords.longitude];
-        if (!userMarker) userMarker = L.marker(point, { icon: locationIcon, title: 'Your location' }).addTo(map);
-        else userMarker.setLatLng(point);
-        map.setView(point, Math.max(map.getZoom(), 16), { animate: true });
-        statusEl.textContent = 'Your location is shown on the map.';
-      }, error => {
-        const messages = {
-          1: 'Location permission was denied. You can enable it in browser settings.',
-          2: 'Your location could not be determined.',
-          3: 'Location request timed out. Please try again.'
-        };
-        statusEl.textContent = messages[error.code] || 'Unable to get your location.';
-      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 10000 });
-    }
+  const fountaingreenIcon = new L.Icon({
+    iconUrl: 'fountaingreen.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [1, -30],
+  });
 
-    document.getElementById('locate-button').addEventListener('click', locateUser);
-    document.getElementById('reset-button').addEventListener('click', () => {
-      if (!confirm('Start a fresh hunt and clear all your found fountains?')) return;
-      markerStates = {};
-      foundCount = 0;
-      markers.forEach(marker => {
-        marker.isFound = false;
-        marker.setIcon(todoIcon);
-        marker.setPopupContent('Still to find');
-        marker.closePopup();
-      });
-      saveStates();
-      updateProgress();
-    });
+  const fountainredIcon = new L.Icon({
+    iconUrl: 'fountainred.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [1, -30],
+  });
+
+  var markerStates = JSON.parse(localStorage.getItem('markerStates')) || {};
+
+  var fontainesGroup = L.layerGroup();
+
+  var foundCount = 0;
+  var fontaineCount = 0;
+  var toFindCount = 0;
+
+  var progressBar = document.getElementById('prog');
+          
+  fetch('fontaines.json')
+    .then(response => response.json())
+    .then(locations => {
+      locations.forEach((loc, index) => {
+
+        fontaineCount = fontaineCount + 1;
+
+        var isToggled = markerStates[index] || false;
+
+        if (isToggled) foundCount = foundCount + 1;
+
+        var marker = L.marker([loc.Lat, loc.Lon], { icon: isToggled ? fountaingreenIcon : fountainredIcon });
+
+  // Store toggle state on marker object for quick access
+        marker.isToggled = isToggled;
+
+  // Add click event to toggle icon and update state
+        marker.on('click', function() {
+          marker.isToggled = !marker.isToggled;             // Flip state
+          if (marker.isToggled) {
+            foundCount = foundCount + 1;
+            toFindCount = toFindCount - 1;}
+          else {
+            foundCount = foundCount - 1;
+            toFindCount = toFindCount + 1;
+          }
+          document.getElementById("found").textContent = "Found: "+foundCount;
+          document.getElementById("tofind").textContent = "To Find: "+toFindCount;
+
+          progressBar.max = fontaineCount;
+          progressBar.value = foundCount;
+
+          marker.setIcon(marker.isToggled ? fountaingreenIcon : fountainredIcon); // Update icon
+          markerStates[index] = marker.isToggled;           // Update saved states object
+          localStorage.setItem('markerStates', JSON.stringify(markerStates)); // Save to localStorage
+    
+        });  //marker.on
+
+        fontainesGroup.addLayer(marker);
+      
+      }); //locations.forEach
+
+      //console.info(fontaineCount, foundCount);
+
+      toFindCount = fontaineCount - foundCount;
+
+  //console.info(fontaineCount, foundCount, toFindCount);
+      
+      document.getElementById("total").textContent = "Total: "+fontaineCount;
+      document.getElementById("found").textContent = "Found: "+foundCount;
+      document.getElementById("tofind").textContent = "To Find: "+toFindCount;
+
+      progressBar.max = fontaineCount;
+      progressBar.value = foundCount;
+
+    // Add the LayerGroup to the map
+      fontainesGroup.addTo(map);
+    }) // .then(locations
+    .catch(err => {
+    console.error('Failed to load locations:', err);
+  }); // fetch
+
   </script>
-</body>
+
+  </body>
+
 </html>
