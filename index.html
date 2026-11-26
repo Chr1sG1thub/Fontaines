@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#f5f7f2">
+  <meta name="theme-color" content="#ffdf4d">
   <meta name="description" content="Explore the fountains and keep track of the ones you've found.">
-  <title>Fontaines · Fountain finder</title>
+  <title>Fontaines · The great fountain hunt</title>
   <link rel="icon" href="location.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
@@ -107,14 +107,63 @@
       .map-credit { bottom: max(10px, env(safe-area-inset-bottom)); }
     }
   </style>
+
+  <style>
+    :root { --ink:#27204a; --muted:#716b87; --green:#168b75; --red:#f05d58; }
+    body { background:#fff3cf; }
+    .panel { width:min(340px,calc(100vw - 32px)); padding:20px; border:3px solid #fff; border-radius:25px; background:#fffdf5; box-shadow:0 7px 0 rgba(79,55,137,.13),0 18px 38px rgba(52,39,91,.18); }
+    .panel::after { content:"☀️"; position:absolute; top:13px; right:16px; font-size:29px; transform:rotate(12deg); pointer-events:none; }
+    .eyebrow { display:inline-block; margin:0 0 8px; padding:6px 10px; border-radius:999px; background:#ffe4ef; color:#c53f78; font-size:10px; letter-spacing:.12em; }
+    h1 { color:#4932a1; font-size:30px; font-weight:900; letter-spacing:-.055em; text-shadow:2px 2px 0 #e8dcff; }
+    .subtitle { max-width:265px; margin:7px 0 17px; color:#716b87; font-size:13px; line-height:1.45; }
+    .stats { gap:7px; }
+    .stat { padding:11px 6px 10px; border:2px solid transparent; border-radius:16px; background:#f1ebff; }
+    .stat:nth-child(2) { background:#e0f7e9; }
+    .stat:nth-child(3) { background:#fff0c2; }
+    .stat strong { color:#4932a1; font-size:27px; font-weight:900; }
+    .stat.found strong { color:#12815f; }
+    .stat span { color:#69617f; font-size:9px; letter-spacing:.08em; }
+    .progress-head { margin:17px 0 8px; color:#4932a1; font-size:12px; font-weight:850; }
+    #progress-label { padding:3px 8px; border-radius:99px; background:#ffe0ec; color:#c53f78; font-weight:900; }
+    .progress-track { height:13px; border:2px solid #fff; background:#eee8fb; box-shadow:inset 0 1px 3px rgba(47,31,91,.12); }
+    #progress-fill { background:linear-gradient(90deg,#ff8ab3 0%,#ffb64d 48%,#42c99a 100%); }
+    .legend { gap:15px; color:#716b87; font-size:11px; font-weight:700; }
+    .dot { width:11px; height:11px; box-shadow:0 0 0 2px white; }
+    .dot.todo { background:#f05d58; } .dot.done { background:#18a77c; }
+    .actions { gap:9px; margin-top:16px; }
+    button { min-height:43px; border:2px solid #eee5ff; border-radius:14px; background:#fff; color:#4932a1; font-size:12px; font-weight:850; box-shadow:0 3px 0 #e8e0f7; }
+    button.primary { border:2px solid #ef6d91; background:linear-gradient(135deg,#ff8ab3,#ff6f83); color:#fff; box-shadow:0 4px 0 #d9517b; }
+    button:not(.primary) { background:#fff1ad; border-color:#ffe18a; box-shadow:0 4px 0 #f2d16d; }
+    button:hover { filter:saturate(1.12) brightness(1.02); transform:translateY(-1px); }
+    button:active { transform:translateY(2px) scale(.98); box-shadow:none; }
+    button:focus-visible { outline:3px solid #7554d8; outline-offset:3px; }
+    .status { min-height:17px; margin:13px 0 0; color:#756b8f; font-size:11px; font-weight:650; }
+    .map-credit { border:2px solid #fff; border-radius:999px; background:rgba(255,253,245,.95); color:#5e5480; font-weight:700; }
+    .leaflet-control-zoom a { border:2px solid #fff !important; border-radius:12px !important; background:#fffdf5 !important; color:#4932a1 !important; box-shadow:0 3px 0 rgba(79,55,137,.16); }
+    .leaflet-popup-content-wrapper,.leaflet-popup-tip { border:2px solid #fff; border-radius:15px; background:#fffdf5; color:#27204a; box-shadow:0 5px 0 rgba(79,55,137,.12); }
+    .leaflet-popup-content { line-height:1.5; }
+    @media(max-width:600px) {
+      .panel { padding:15px 15px 13px; border-radius:21px; }
+      .panel::after { top:9px; right:13px; font-size:25px; }
+      h1 { font-size:25px; }
+      .subtitle { max-width:90%; margin:4px 0 11px; }
+      .stat { padding:8px 5px; border-radius:13px; }
+      .stat strong { font-size:23px; }
+      .progress-head { margin-top:12px; }
+      .legend { margin-top:10px; }
+      .actions { margin-top:11px; }
+      button { min-height:40px; }
+    }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { transition-duration:.01ms !important; } }
+  </style>
 </head>
 <body>
   <div id="map" aria-label="Map showing fountains to discover"></div>
 
-  <section class="panel" aria-label="Discovery progress">
-    <p class="eyebrow">Explore nearby</p>
-    <h1>Fontaines</h1>
-    <p class="subtitle">Find the fountains and tap each marker when you've discovered it.</p>
+  <section class="panel" aria-label="Quest progress ✨">
+    <p class="eyebrow">✦ THE GREAT FOUNTAIN HUNT ✦</p>
+    <h1>Fontaines! 💦</h1>
+    <p class="subtitle">A little adventure around town. Spot a fountain? Tap its marker and claim your discovery!</p>
 
     <div class="stats" aria-live="polite">
       <div class="stat"><strong id="total">—</strong><span>Total</span></div>
@@ -135,8 +184,8 @@
       <span class="legend-item"><i class="dot done"></i>Found</span>
     </div>
     <div class="actions">
-      <button class="primary" id="locate-button" type="button">◎ My location</button>
-      <button id="reset-button" type="button">Reset</button>
+      <button class="primary" id="locate-button" type="button">📍 Find me</button>
+      <button id="reset-button" type="button">↻ Start over</button>
     </div>
     <p class="status" id="status" role="status">Loading fountain locations…</p>
   </section>
@@ -195,8 +244,8 @@
       progress.setAttribute('aria-valuemax', fountainCount);
       progress.setAttribute('aria-valuenow', foundCount);
       statusEl.textContent = remaining === 0 && fountainCount
-        ? 'Wonderful — every fountain found!'
-        : foundCount ? 'Your discoveries are saved on this device.' : 'Tap a fountain marker when you find it.';
+        ? 'Amazing! You found them all! 🎉'
+        : foundCount ? 'Nice one! Your discoveries are saved. ⭐' : 'Ready, explorer? Tap a fountain when you find it. 🧭';
     }
 
     function saveStates() {
@@ -302,7 +351,7 @@
 
     document.getElementById('locate-button').addEventListener('click', locateUser);
     document.getElementById('reset-button').addEventListener('click', () => {
-      if (!confirm('Reset all fountain discoveries on this device?')) return;
+      if (!confirm('Start a fresh hunt and clear all your found fountains?')) return;
       markerStates = {};
       foundCount = 0;
       markers.forEach(marker => {
