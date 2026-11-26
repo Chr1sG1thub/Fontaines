@@ -170,6 +170,7 @@
 
     let userMarker = null;
     let watchId = null;
+    let latestUserPoint = null;
     let fountainCount = 0;
     let foundCount = 0;
     const markers = [];
@@ -250,13 +251,34 @@
           const bounds = group.getBounds();
           map.fitBounds(bounds, { paddingTopLeft: [25, 210], paddingBottomRight: [25, 35], maxZoom: 16 });
         }
+        startLocationWatch();
       })
       .catch(error => {
         console.error('Failed to load locations:', error);
         statusEl.textContent = 'Could not load the fountains. Check your connection and reload.';
       });
 
+    function startLocationWatch() {
+      if (!('geolocation' in navigator)) return;
+      watchId = navigator.geolocation.watchPosition(position => {
+        latestUserPoint = [position.coords.latitude, position.coords.longitude];
+        if (!userMarker) {
+          userMarker = L.marker(latestUserPoint, { icon: locationIcon, title: 'Your location' }).addTo(map);
+          map.panTo(latestUserPoint);
+        } else {
+          userMarker.setLatLng(latestUserPoint);
+        }
+      }, error => {
+        console.info('Location update unavailable:', error.message);
+      }, { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 });
+    }
+
     function locateUser() {
+      if (latestUserPoint) {
+        map.setView(latestUserPoint, Math.max(map.getZoom(), 16), { animate: true });
+        statusEl.textContent = 'Your location is shown on the map.';
+        return;
+      }
       if (!('geolocation' in navigator)) {
         statusEl.textContent = 'Location is not available in this browser.';
         return;
